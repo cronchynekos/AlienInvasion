@@ -1,17 +1,24 @@
 import pygame as pg
 import sys
-from game_functions import create_fleet
-from settings import Settings
+from alien import AlienFleet, Alien
+# from settings import Settings
+from vector import Vector
+from button import Button
+
 GREEN = (0, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREY = (130, 130, 130)
 
 
-
 class LandingPage:
-    def __init__(self, screen):
-        self.screen = screen
+    alien_one_imgs = [pg.image.load(f'images/alien1.gif')]
+    alien_two_imgs = [pg.image.load(f'images/alien2.gif')]
+    alien_three_imgs = [pg.image.load(f'images/alien3.gif')]
+    ufo_imgs = [pg.image.load(f'images/alien4.gif')]
+
+    def __init__(self, game):
+        self.screen = game.screen
         self.landing_page_finished = False
 
         headingFont = pg.font.SysFont(None, 192)
@@ -21,19 +28,32 @@ class LandingPage:
         strings = [('SPACE', WHITE, headingFont), ('INVADERS', GREEN, subheadingFont),
                 ('= 10 PTS', GREY, font), ('= 20 PTS', GREY, font),
                             ('= 40 PTS', GREY, font), ('= ???', GREY, font),
-                ('PLAY GAME', GREEN, font), ('HIGH SCORES', GREY, font)]
+               # ('PLAY GAME', GREEN, font), 
+                ('HIGH SCORES', GREY, font)]
 
         self.texts = [self.get_text(msg=s[0], color=s[1], font=s[2]) for s in strings]
 
         self.posns = [150, 230]
         alien = [60 * x + 400 for x in range(4)]
-        play_high = [x for x in range(650, 760, 80)]
+        # play_high = [x for x in range(650, 760, 80)]
+        # play_high = 730
         self.posns.extend(alien)
-        self.posns.extend(play_high)
+        self.posns.append(730)
 
         centerx = self.screen.get_rect().centerx
+
+        self.play_button = Button(self.screen, "PLAY GAME", ul=(centerx - 150, 650))
+
         n = len(self.texts)
         self.rects = [self.get_text_rect(text=self.texts[i], centerx=centerx, centery=self.posns[i]) for i in range(n)]
+        self.alien_one = Alien(game=game, image_list=LandingPage.alien_one_imgs, 
+                               v=Vector(), ul=(centerx - 120, 385))
+        self.alien_two = Alien(game=game, image_list=LandingPage.alien_two_imgs, 
+                               v=Vector(), ul=(centerx - 180, 445))
+        self.alien_three = Alien(game=game, image_list=LandingPage.alien_three_imgs, 
+                               v=Vector(), ul=(centerx - 150, 490))
+        self.ufo = Alien(game=game, image_list=LandingPage.ufo_imgs, 
+                               v=Vector(), ul=(centerx - 120, 565))
 
     def get_text(self, font, msg, color): return font.render(msg, True, color, BLACK)
 
@@ -48,8 +68,12 @@ class LandingPage:
             if e.type == pg.QUIT:
                 sys.exit()
             if e.type == pg.KEYUP and e.key == pg.K_p:   # pretend PLAY BUTTON pressed
-                self.landing_page_finished = True        # TODO change to actual PLAY button
-                                                         # SEE ch. 14 of Crash Course for button
+                self.landing_page_finished = True        
+            elif e.type == pg.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pg.mouse.get_pos()
+                if self.play_button.rect.collidepoint(mouse_x, mouse_y):
+                    self.landing_page_finished = True
+
     def update(self):       # TODO make aliens move
         pass 
 
@@ -66,11 +90,12 @@ class LandingPage:
 
     def draw(self):
         self.screen.fill(BLACK)
-        self.draw_text()
         self.alien_one.draw()
         self.alien_two.draw()
         self.alien_three.draw()
-        self.alien_four.draw()
+        self.ufo.draw()
+        self.draw_text()
+        self.play_button.draw()
         # self.alien_fleet.draw()   # TODO draw my aliens
         # self.lasers.draw()        # TODO dray my button and handle mouse events
         pg.display.flip()

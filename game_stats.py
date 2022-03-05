@@ -1,19 +1,15 @@
-class GameStats():
-    """Track statistics for Alien Invasion."""
-
-    def __init__(self, ai_settings):
-        """Initialize statistics."""
-        self.ai_settings = ai_settings
+class GameStats:
+    def __init__(self, game):
+        self.game = game
+        self.settings = game.settings
         self.reset_stats()
+        self.last_ships_left = self.ships_left
 
-        # Start Alien Invasion in an inactive state.
-        self.game_active = False
-
-        # High score should never be reset.
-        self.high_score = 0
-
-    def reset_stats(self):
-        """Initialize statistics that can change during the game."""
-        self.ships_left = self.ai_settings.ship_limit
-        self.score = 0
-        self.level = 1
+    def reset_stats(self): self.ships_left = self.settings.ship_limit
+    def ship_hit(self):
+        self.ships_left -= 1
+        n = self.ships_left
+        print(f'SHIP HIT!', end=' ')
+        if self.last_ships_left != self.ships_left:
+            print(f'{self.ships_left} ship{"s" if n != 1 else ""} left')
+            self.last_ships_left = self.ships_left
