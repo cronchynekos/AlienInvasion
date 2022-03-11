@@ -4,8 +4,8 @@ from timer import Timer
 from pygame.sprite import Sprite, Group
 
 class Ship(Sprite):
-  exploding_images = [pg.image.load(f'images/explode{n}.png') for n in range(8)]
-  images = [pg.image.load(f'images/ship.bmp') for n in range(1)]
+  exploding_images = [pg.image.load(f'images/explosionship{n}.png') for n in range(9)]
+  images = [pg.image.load(f'images/ship{n}.png') for n in range(2)]
    
   def __init__(self, game):
     super().__init__()
@@ -15,7 +15,7 @@ class Ship(Sprite):
     self.alien_fleet = None
     self.lasers = None
     self.stats = game.stats
-    self.image = pg.image.load('images/ship.bmp')
+    self.image = pg.image.load('images/ship0.png')
 
     self.rect = self.image.get_rect()
     self.screen_rect = self.screen.get_rect()

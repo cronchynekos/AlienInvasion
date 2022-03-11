@@ -30,21 +30,22 @@ class Timer:
     self.next_frame()
     return self.image_list[self.index]
 
-# this code goes in Alien class
-# alien_images = [pg.image.load(f'images/alien{n}.bmp') for n in range(4)]
-# alien_explosion_images = [pg.image.load(f'images/alien_explosion{n}.bmp') for n in range(6)]
 
-# self.regular_timer = Timer(image_list=alien_images)
-# self.explosion_timer = Timer(image_list=alien_explosion_images, delay=200, is_loop=False)
-# self.timer = self.regular_timer
+class CommandTimer(Timer):
+  def __init__(self, image_list, start_index=0, delay=100, is_loop=True): 
+    super().__init__(image_list, start_index, delay, is_loop)
 
-# def update(self): 
-#   # ...
-#   # if killed... logic
-#     self.timer = self.explosion_timer
-#     self.timer = self.regular_timer
+def next_frame(self): 
+      # if a one-pass timer that has finished
+  if not self.is_loop and self.index == len(self.image_list) - 1: return 
+  now = pg.time.get_ticks()
 
-#   def draw(self):  
-#     image = self.timer.image()
-#     rect = image.get_rect()
-#     self.screen.blit(image, rect)
+  self.index += 1
+  if self.is_loop: self.index %= self.frames
+  self.last_time_switched = now
+
+  # def is_expired(self): pass 
+  # def reset(self): pass 
+
+def image(self): 
+  return self.image_list[self.index]

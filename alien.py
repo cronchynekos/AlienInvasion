@@ -5,9 +5,10 @@ from timer import Timer
 from random import randint
 
 
+
 class AlienFleet:
-    alien_exploding_images = [pg.image.load(f'images/rainbow_explode{n}.png') for n in range(8)]
-    alien_images = [pg.image.load(f'images/alien{n}.bmp') for n in range(2)]
+    alien_exploding_images = [pg.image.load(f'images/explosion{n}.png') for n in range(5)]
+    alien_images = [pg.image.load(f'images/alien{n}.png') for n in range(2)]
 
     def __init__(self, game, v=Vector(1, 0)):
         self.game = game
@@ -82,11 +83,15 @@ class AlienFleet:
 
 
 class Alien(Sprite):
-    def __init__(self, game, image_list, start_index=0, ul=(0, 100), v=Vector(1, 0)):
+    def __init__(self, game, image_list, start_index=0, ul=(0, 100), v=Vector(1, 0),
+                 points=1211):
         super().__init__()
         self.game = game
         self.screen = game.screen
         self.settings = game.settings
+        self.points = points
+        self.stats = game.stats
+
         self.image = pg.image.load('images/alien0.bmp')
         self.screen_rect = self.screen.get_rect()
         self.rect = self.image.get_rect()
@@ -107,8 +112,9 @@ class Alien(Sprite):
         return r.right >= self.screen_rect.right or r.left <= 0
 
     def hit(self): 
-      self.timer = self.exploding_timer
-      self.dying = True
+        self.stats.alien_hit(alien=self)
+        self.timer = self.exploding_timer
+        self.dying = True
 
     def update(self, delta_s=Vector(0, 0)):
         if self.dying and self.timer.is_expired():

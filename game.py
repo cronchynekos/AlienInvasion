@@ -3,11 +3,13 @@ from landing_page import LandingPage
 from sys import exit
 import game_functions as gf
 from time import sleep
-from game_stats import GameStats
+from stats import Stats
+from scoreboard import Scoreboard
 from laser import Lasers
 from ship import Ship
 from alien import AlienFleet
 from settings import Settings
+from barrier import Barrier
 
 
 class Game:
@@ -17,10 +19,11 @@ class Game:
     def __init__(self):
         pg.init()
         self.settings = Settings()
-        self.stats = GameStats(game=self)
+        self.stats = Stats(game=self)
         self.screen = pg.display.set_mode((self.settings.screen_width,
                                            self.settings.screen_height))
         self.bg_color = self.settings.bg_color
+        self.sb = Scoreboard(game=self)
         pg.display.set_caption("Alien Invasion")
         self.ship = Ship(game=self)
         self.alien_fleet = AlienFleet(game=self)
@@ -45,12 +48,14 @@ class Game:
         self.ship.update()
         self.alien_fleet.update()
         self.lasers.update()
+        self.sb.update()
 
     def draw(self):
         self.screen.fill(self.bg_color)
         self.ship.draw()
         self.alien_fleet.draw()
         self.lasers.draw()
+        self.sb.draw()
         pg.display.flip()
 
     def play(self):
