@@ -9,7 +9,7 @@ from laser import Lasers
 from ship import Ship
 from alien import AlienFleet
 from settings import Settings
-from barrier import Barrier
+from sound import Sound
 
 
 class Game:
@@ -23,11 +23,13 @@ class Game:
         self.screen = pg.display.set_mode((self.settings.screen_width,
                                            self.settings.screen_height))
         self.bg_color = self.settings.bg_color
+        self.sound = Sound()
         self.sb = Scoreboard(game=self)
         pg.display.set_caption("Alien Invasion")
         self.ship = Ship(game=self)
         self.alien_fleet = AlienFleet(game=self)
-        self.lasers = Lasers(game=self)
+        self.lasers = Lasers(game=self, owner=self.ship)                  # for ship lasers
+        # self.alien_lasers = Lasers(game=self, owner=self.alien_fleet)   # for alien lasers
         self.ship.set_alien_fleet(self.alien_fleet)
         self.ship.set_lasers(self.lasers)
 
@@ -35,6 +37,8 @@ class Game:
         if self.stats.ships_left == 0: 
           self.game_over()
         print("restarting game")
+        while self.sound.busy():    # wait for explosion sound to finish
+            pass
         self.lasers.empty()
         self.alien_fleet.empty()
         self.alien_fleet.create_fleet()
@@ -60,14 +64,16 @@ class Game:
 
     def play(self):
         self.finished = False
+        self.sound.play_bg()
         while not self.finished:
             self.update()
             self.draw()
             gf.check_events(game=self)   # exits game if QUIT pressed
         self.game_over()
 
-    def game_over(self): 
-      print('\nGAME OVER!\n\n')  
+    def game_over(self):
+      self.sound.play_game_over()
+      print('\nGAME OVER!\n\n')
       exit()    # can ask to replay here instead of exiting the game
 
 def main():

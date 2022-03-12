@@ -1,24 +1,33 @@
 import pygame as pg
+
+import alien
 from vector import Vector
 from pygame.sprite import Sprite, Group
 from copy import copy
 from random import randint
+from sound import Sound
 # from alien import Alien
 # from stats import Stats
 
 
 class Lasers:
-    def __init__(self, game):
+    def __init__(self, game, owner):
         self.game = game
         self.stats = game.stats
+        self.sound = game.sound
+        self.owner = owner
         self.alien_fleet = game.alien_fleet
         self.lasers = Group()
+        print('owner is ', self.owner, 'type is: ', type(self.owner))
+        print('type is alien.AlienFleet is: ', type(owner) is alien.AlienFleet)
 
     def add(self, laser): self.lasers.add(laser)
     def empty(self): self.lasers.empty()
     def fire(self): 
-      new_laser = Laser(self.game)
-      self.lasers.add(new_laser)
+        new_laser = Laser(self.game)
+        self.lasers.add(new_laser)
+        snd = self.sound
+        snd.play_fire_phaser() if type(self.owner) is alien.AlienFleet else snd.play_fire_photon()
 
     def update(self):
         for laser in self.lasers.copy():

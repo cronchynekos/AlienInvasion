@@ -2,22 +2,33 @@ import pygame as pg
 from vector import Vector
 from pygame.sprite import Sprite, Group
 from timer import Timer
+from sound import Sound
 from random import randint
 
 
 
 class AlienFleet:
-    alien_exploding_images = [pg.image.load(f'images/explosion{n}.png') for n in range(5)]
-    alien_images = [pg.image.load(f'images/alien{n}.png') for n in range(2)]
+    alien_exploding_images = [pg.image.load(f'images/rainbow_explode{n}.png') for n in range(8)]
+    # alien_images0 = [pg.transform.rotozoom(pg.image.load(f'images/alien0{n}.bmp'), 0, 1.2) for m in range(3)]
+    # alien_images1 = [pg.transform.rotozoom(pg.image.load(f'images/alien1{n}.bmp'), 0, 2) for m in range(3)]
+    # alien_images2 = [pg.transform.rotozoom(pg.image.load(f'images/alien2{n}.bmp'), 0, 3) for m in range(3)]
+
+    # alien_images = [alien_images0, alien_images1, alien_images2]
+    
+    alien_images = [[pg.transform.rotozoom(pg.image.load(f'images/alien{m}{n}.png'), 0, 0.5) for n in range(2)] for m in range(3)]
+    ufo_imgs = [pg.transform.rotozoom(pg.image.load(f'images/ufo{n}.png'), 0, 0.5) for n in range(2)]
+    alien_images.append(ufo_imgs)
+    alien_points = [40, 20, 10, 100]
 
     def __init__(self, game, v=Vector(1, 0)):
         self.game = game
         self.ship = self.game.ship
         self.settings = game.settings
         self.screen = self.game.screen
+        self.sound = game.sound
         self.screen_rect = self.screen.get_rect()
         self.v = v
-        alien = Alien(self.game, image_list=AlienFleet.alien_images)
+        alien = Alien(self.game, sound=self.sound, alien_index=0, image_list=AlienFleet.alien_images)
         self.alien_h, self.alien_w = alien.rect.height, alien.rect.width
         self.fleet = Group()
         self.create_fleet()
@@ -32,12 +43,12 @@ class AlienFleet:
 
     def set_ship(self, ship): self.ship = ship
     def create_alien(self, row, col):
-        x = self.alien_w * (2 * col + 1)
-        y = self.alien_h * (2 * row + 1)
+        x = self.alien_w * (1.2 * col + 1)
+        y = self.alien_h * (1.2 * row + 1)
         images = AlienFleet.alien_images
         # alien = Alien(game=self.game, ul=(x, y), v=self.v, image_list=images, 
         #               start_index=randint(0, len(images) - 1))
-        alien = Alien(game=self.game, ul=(x, y), v=self.v, image_list=images)
+        alien = Alien(game=self.game, sound=self.sound, alien_index = row // 2, ul=(x, y), v=self.v, image_list=images)
         self.fleet.add(alien)
 
     def empty(self): self.fleet.empty()
@@ -46,8 +57,8 @@ class AlienFleet:
         return int(spacex / (2 * alien_width))
 
     def get_number_rows(self, ship_height, alien_height):
-        spacey = self.settings.screen_height - 3 * alien_height - ship_height
-        return int(spacey / (2 * alien_height))
+        spacey = self.settings.screen_height - 2 * alien_height - ship_height
+        return int(spacey / (1.75 * alien_height))
 
     def length(self): return len(self.fleet.sprites())
 
@@ -83,14 +94,17 @@ class AlienFleet:
 
 
 class Alien(Sprite):
-    def __init__(self, game, image_list, start_index=0, ul=(0, 100), v=Vector(1, 0),
+    def __init__(self, game, image_list, alien_index, sound, start_index=0, ul=(0, 100), v=Vector(1, 0),
                  points=1211):
         super().__init__()
         self.game = game
         self.screen = game.screen
         self.settings = game.settings
-        self.points = points
+        self.sound = sound
+        self.points = AlienFleet.alien_points[alien_index]
         self.stats = game.stats
+
+        self.alien_index = alien_index
 
         self.image = pg.image.load('images/alien0.bmp')
         self.screen_rect = self.screen.get_rect()
@@ -101,7 +115,8 @@ class Alien(Sprite):
         self.image_list = image_list
         self.exploding_timer = Timer(image_list=AlienFleet.alien_exploding_images, delay=200, 
                                      start_index=start_index, is_loop=False)
-        self.normal_timer = Timer(image_list=image_list, delay=1000, is_loop=True)
+
+        self.normal_timer = Timer(image_list=AlienFleet.alien_images[alien_index], delay=1000, is_loop=True)
         self.timer = self.normal_timer
         self.dying = False
 
@@ -114,6 +129,7 @@ class Alien(Sprite):
     def hit(self): 
         self.stats.alien_hit(alien=self)
         self.timer = self.exploding_timer
+        self.sound.play_alien_explosion()
         self.dying = True
 
     def update(self, delta_s=Vector(0, 0)):

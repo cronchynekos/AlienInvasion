@@ -25,7 +25,7 @@ class Barriers:
 
 
 class Barrier(Sprite):
-    img_list = [pg.image.load(f'images/block{n}.png') for n in range(5)]
+    img_list = []
     def __init__(self, game, ul, wh): 
         self.game = game
         self.barrier_elements = Group()
