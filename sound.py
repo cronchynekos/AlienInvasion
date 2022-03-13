@@ -8,7 +8,7 @@ class Sound:
         self.ship_photon = pg.mixer.Sound('sounds/shiplazer.wav')
         self.alien_explosion = pg.mixer.Sound('sounds/alienexplosion.wav')
         self.ship_explosion = pg.mixer.Sound('sounds/shipexplosion.wav')
-        self.end_theme = pg.mixer.Sound('sounds/alientheme.wav')
+        self.end_theme = pg.mixer.Sound('sounds/endingtheme.wav')
         self.ufo = pg.mixer.Sound('sounds/star_trek_ufo.wav')
 
     def play_music(self, music, volume=0.3):

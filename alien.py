@@ -8,7 +8,7 @@ from random import randint
 
 
 class AlienFleet:
-    alien_exploding_images = [pg.image.load(f'images/rainbow_explode{n}.png') for n in range(8)]
+    alien_exploding_images = [pg.image.load(f'images/explosion{n}.png') for n in range(5)]
     # alien_images0 = [pg.transform.rotozoom(pg.image.load(f'images/alien0{n}.bmp'), 0, 1.2) for m in range(3)]
     # alien_images1 = [pg.transform.rotozoom(pg.image.load(f'images/alien1{n}.bmp'), 0, 2) for m in range(3)]
     # alien_images2 = [pg.transform.rotozoom(pg.image.load(f'images/alien2{n}.bmp'), 0, 3) for m in range(3)]
