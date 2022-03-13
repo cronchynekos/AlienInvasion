@@ -1,4 +1,6 @@
 import pygame as pg
+import pygame.time
+
 from vector import Vector
 from pygame.sprite import Sprite, Group
 from timer import Timer
@@ -32,6 +34,9 @@ class AlienFleet:
         self.alien_h, self.alien_w = alien.rect.height, alien.rect.width
         self.fleet = Group()
         self.create_fleet()
+        self.fire_timer = pygame.time.get_ticks() + randint(0, 1000)
+        self.lasers = None
+        self.frames = 0
 
     def create_fleet(self):
         n_cols = self.get_number_cols(alien_width=self.alien_w)
@@ -77,6 +82,10 @@ class AlienFleet:
         if alien.check_edges(): return True
       return False
 
+    # def fire_timer(self):
+    def set_lasers(self, lasers):
+        self.lasers = lasers
+
     def update(self):
         delta_s = Vector(0, 0)    # don't change y position in general
         if self.check_edges():
@@ -87,6 +96,11 @@ class AlienFleet:
             if not self.ship.is_dying(): self.ship.hit() 
         for alien in self.fleet.sprites():
             alien.update(delta_s=delta_s)
+
+        if pygame.time.get_ticks() > self.fire_timer:
+            self.lasers.fire()
+            self.frames += 1
+            self.fire_timer = self.fire_timer + randint(0, 1000)
 
     def draw(self):
         for alien in self.fleet.sprites():

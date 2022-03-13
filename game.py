@@ -29,7 +29,8 @@ class Game:
         self.ship = Ship(game=self)
         self.alien_fleet = AlienFleet(game=self)
         self.lasers = Lasers(game=self, owner=self.ship)                  # for ship lasers
-        # self.alien_lasers = Lasers(game=self, owner=self.alien_fleet)   # for alien lasers
+        self.alien_lasers = Lasers(game=self, owner=self.alien_fleet)
+        self.alien_fleet.set_lasers(self.alien_lasers)
         self.ship.set_alien_fleet(self.alien_fleet)
         self.ship.set_lasers(self.lasers)
 

@@ -18,6 +18,7 @@ class Lasers:
         self.owner = owner
         self.alien_fleet = game.alien_fleet
         self.lasers = Group()
+        self.ship = game.ship
         print('owner is ', self.owner, 'type is: ', type(self.owner))
         print('type is alien.AlienFleet is: ', type(owner) is alien.AlienFleet)
 
@@ -33,9 +34,15 @@ class Lasers:
         for laser in self.lasers.copy():
             if laser.rect.bottom <= 0: self.lasers.remove(laser)
 
-        collisions = pg.sprite.groupcollide(self.alien_fleet.fleet, self.lasers, False, True)
-        for alien in collisions: 
-          if not alien.dying: alien.hit()
+
+        if self.owner == self.alien_fleet:
+            ship_collisions = pg.sprite.spritecollide(self.ship, self.lasers, True)
+            if len(ship_collisions) > 0:
+                if not self.ship.is_dying(): self.ship.hit(self.ship)
+        else:
+            alien_collisions = pg.sprite.groupcollide(self.alien_fleet.fleet, self.lasers, False, True)
+            for alien in alien_collisions:
+                if not alien.dying: alien.hit()
 
         if self.alien_fleet.length() == 0:  
             self.stats.level_up()
@@ -52,22 +59,34 @@ class Lasers:
 class Laser(Sprite):
     def __init__(self, game):
         super().__init__()
+        self.owner = None
         self.game = game
         self.screen = game.screen
         self.settings = game.settings
         self.w, self.h = self.settings.laser_width, self.settings.laser_height
         self.ship = game.ship
-
+        self.aliens = game.alien_fleet.fleet
         self.rect = pg.Rect(0, 0, self.w, self.h)
         self.center = copy(self.ship.center)
-        # print(f'center is at {self.center}')
-        # self.color = self.settings.laser_color
         tu = 50, 255
         self.color = randint(*tu), randint(*tu), randint(*tu)
-        self.v = Vector(0, -1) * self.settings.laser_speed_factor
+
+        if self.owner == self.ship:
+            self.v = Vector(0, -1) * self.settings.laser_speed_factor
+            self.center = copy(self.ship.center)
+        else:
+            self.v = Vector(0, 1) * self.settings.laser_speed_factor
+            tempRandomInt = randint(0, game.alien_fleet.length())
+            counter = 0
+            for i in self.aliens:
+                if counter == tempRandomInt:
+                    self.center = copy(i.ul)
+                counter += 1
+
+        # self.v = Vector(0, -1) * self.settings.laser_speed_factor
 
     def update(self):
         self.center += self.v
-        self.rect.x, self.rect.y = self.center.x, self.center.y
+        self.rect.x, self.rect.y = self.center.x, (self.center.y + 350)
 
     def draw(self): pg.draw.rect(self.screen, color=self.color, rect=self.rect)
